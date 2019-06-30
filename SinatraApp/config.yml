@@ -1,0 +1,11 @@
+jenkins_host: "optierjenkins.mo.sap.corp"
+jenkins_port: "8443"
+jenkins_url: "https://optierjenkins.mo.sap.corp:8443/job"
+
+# Automation Test configuration
+viewTestUrl:  "/triggerAutomationTest"
+triggerTestUrl:  "/triggerAutomationTest/buildWithParameters?delay=0sec&token=SERVICE"
+statusTestUrl: "/triggerAutomationTest/api/json"
+lastBuildTestUrl:  "/triggerAutomationTest/lastBuild" 
+
+time_zone: 'Asia/Jerusalem'

@@ -1,0 +1,9 @@
+- hosts: servers
+  vars:
+    chef_dir: /var/lib/monsoon/repos/chefrepo/sfautomation
+  tasks:
+  - shell: /usr/bin/chef-solo -c solo.rb -j dna.json
+    register: chef
+    args:
+      chdir: "{{chef_dir}}"
+  - debug: msg={{chef.stdout_lines}}

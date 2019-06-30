@@ -1,0 +1,14 @@
+<tr>
+	<td><%= workunit[:assKey] %></td>
+	<td><%= workunit[:invokingTier] %></td>
+	<td><%= workunit[:executingTier] %></td>
+	<td><%= workunit[:rawProtocol] %></td>
+	<td><%= workunit[:wu_status] %></td>		
+	<td>
+		<% if workunit[:wuattr_status].nil? %>
+			-
+		<% else %>
+			<%= workunit[:wuattr_status] %>
+		<% end %>
+	</td>
+</tr>

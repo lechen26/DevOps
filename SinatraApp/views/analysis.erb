@@ -1,0 +1,88 @@
+<html>
+  <body>
+    <div class="col-md-12 col-sm-12 col-xs-12">
+  	 <div class="x_panel">
+	     <div class="x_content">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card-box table-responsive">           
+              <h2 class="text-muted font-13 m-b-30">              
+             	  Analysis List 
+                <small>click on analysis id to see full execution report, and on test name to see his JSON file</small>            	
+              </h2>
+         
+              <table id="datatable-keytable-analysis" class="table-hover table table-striped table-bordered sorting" role="grid">
+                <thead>
+                  <tr>                  	
+                    <th>AnalysisID</th>  
+                    <th>TestName</th>
+                    <th>Environment</th>
+                    <th>JsonID</th>
+                    <th>Analysis Timestamp</th>
+                    <th>Server Name</th>
+                    <th>SuccessRate</th>
+                  </tr>
+                </thead>			
+                <tbody>
+                <% @analysis.each do |exec| %>
+		              <tr>       
+                    <td>
+                      <a href="/generate_report?analysis_id=<%= exec[:analysis_id] %>"><%= exec[:analysis_id] %></a>
+                    </td>                                                 
+                    <td>
+                      <a href="/view_json?test_name=<%= exec[:test_name] %>&json_id=<%= exec[:json_id]%>&environment=<%= exec[:environment]%>"
+                        <div style="height:100%;width:100%">
+                          <%= exec[:test_name] %>
+                        </div>
+                      </a>     
+                    </td>	
+                    <td><%= exec[:environment] %></td>                                                  
+                    <td><%= exec[:json_id] %></td>                       	                    		  
+                    <td><%= exec[:timestamp]%></td>               
+                    <td><%= exec[:server] %></td>
+	          		    <td><%= exec[:success_rate] %></td>
+	          		  </tr>
+          	    <% end %>
+	           		</tbody>           			           	
+              </table>                
+              </div>
+           </div>
+	        </div>
+  	    </div>
+	   </div>
+    </div> 
+
+     <!-- jQuery -->
+    <script src="./vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Datatables -->
+    <script src="./vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="./vendors/datatables.net/js/dataTables.select.min.js"></script>
+    <script src="./vendors/datatables.net/js/dataTables.buttons.min.js"></script>
+    <script src="./vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="./vendors/Chart.js/dist/Chart.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="./vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="./vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="./vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="./vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="./vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  
+      <script>    
+     $(document).ready(function() {        
+         var table= $('#datatable-keytable-analysis').DataTable({
+          keys: true ,
+          "order": [[ 4, "desc" ]]
+        });
+    
+         tests_table
+          .on( 'select', function ( e, dt, type, indexes ) {
+              test_name = tests_table.rows( indexes ).data().toArray()[0][0];
+              console.log(test_name);
+         } )
+     } );
+    </script>
+  </body>
+</html>

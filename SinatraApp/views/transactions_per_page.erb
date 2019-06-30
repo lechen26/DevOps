@@ -1,0 +1,67 @@
+
+ <!-- Expected Transactions -->
+<% if @trans[:data][:expected_results].any? && @trans[:data][:expected_results].select { |t| t[:pageId] == pageId }.any? %>
+  <h2 style="width:200px;" class="x_title_header">Expected Transactions</h2>
+  <table class="data table table-striped" style="table-layout: fixed">
+    <thead>  
+      <col width="5%"/>
+      <col width="80%"/>
+      <col width="50%"/>
+      <col width="10%"/>
+      <col width="10%"/>
+      <col width="10%"/>            
+      <col width="10%"/>            
+      <tr>
+        <th>#</th>
+        <th>Tranaction Name</th>
+        <th>Transaction UUID</th>
+        <th>Is Exist</th>
+	<th>Dims Status</th>
+        <th>WU Status</th>
+        <th>WU Attrs</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <% @trans[:data][:expected_results].each.with_index(1) do |tran,idx| %>
+        <% if tran[:pageId].eql?(pageId) %>              
+          <%= erb :transaction_row , :locals => {:tran => tran, :idx => idx} %>
+        <% end %>              
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<!-- Not Expected Transactions -->
+<% if @trans[:data][:not_expected_results].any? && @trans[:data][:not_expected_results].select { |t| t[:pageId] == pageId }.any? %>
+  <h2 style="width:200px;" class="x_title_header">UnExpected Transactions</h2>
+  <table class="data table table-striped" style="table-layout: fixed">
+    <thead>  
+      <col width="5%"/>
+      <col width="80%"/>
+      <col width="50%"/>
+      <col width="10%"/>
+      <col width="10%"/>
+      <col width="10%"/>            
+      <col width="10%"/>            
+      <tr>
+        <th>#</th>
+        <th>Tranaction Name</th>
+        <th>Transaction UUID</th>
+        <th>Is Exist</th>
+	 <th>Dims Status</th>
+        <th>WU Status</th>
+        <th>WU Attrs</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @trans[:data][:not_expected_results].each.with_index(1) do |tran,idx| %>
+        <% if tran[:pageId].eql?(pageId) %>              
+          <%= erb :transaction_row , :locals => {:tran => tran, :idx => idx} %>
+        <% end %>              
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+

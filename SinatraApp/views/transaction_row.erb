@@ -1,0 +1,21 @@
+<tr>
+	<td><%= idx %></td>
+	<td>
+	 <% if tran[:tr_exist] && ( tran[:tr_dims_status].nil? || tran[:tr_dims_status] ) &&  ( tran[:wu_status].nil? || tran[:wu_status] )&&  ( tran[:wu_attr_status].nil? || tran[:wu_attr_status] )%>
+	 	<div style="overflow:scroll;"><%= tran[:name] %></div>
+          <% else %>
+                <div style="overflow:scroll;color:red"><%= tran[:name] %></div>
+          <% end %>
+	</td>
+	<td><%= tran[:uuid] %></td>	
+	<td><%= tran[:tr_exist] %></td>
+	<td>
+                <% if tran[:tr_dims_status].nil? %>
+                        -
+                <% else %>
+                        <%= tran[:tr_dims_status] %>
+                <% end %>
+        </td>
+	<td><%= tran[:wu_status] %></a></td>
+	<td><%= tran[:wu_attr_status] %></td>
+</tr>

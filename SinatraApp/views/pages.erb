@@ -1,0 +1,69 @@
+<style>
+ .x_title_header {
+  border-bottom: 2px solid #E6E9ED;
+  padding: 1px 5px 6px;}
+</style>
+
+
+<% if ! @pages.nil? && @pages[:total_count].nonzero?%>
+
+  <!-- Expected Pages -->
+  <% if @pages[:data][:expected_results].any? %>
+    <div>
+      <h2 style="width:200px;" class="x_title_header">Expected Pages</h2>
+      <table class="data table table-striped no-margin">
+        <col width="2%"/>
+         <col width="15%"/>
+         <col width="15%"/>
+         <col width="40%"/>
+         <col width="15%"/>
+          <col width="15%"/>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Page Name</th>
+	    <th>Page Label</th>
+            <th>Page PageID</th>
+            <th>Is Exist</th>
+            <th>TR Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @pages[:data][:expected_results].each.with_index(1) do |page,idx| %>
+            <%= erb :page_row , :locals => {:page => page, :idx => idx} %>
+          <% end %>              
+        </tbody>
+        </table>
+    </div>
+  <% end %>
+
+  <!-- Not Expected Pages -->
+  <% if @pages[:data][:not_expected_results].any? %>
+    <div>
+      <h2 style="width:200px;" class="x_title_header">Not Expected Pages</h2>
+      <table class="data table table-striped no-margin">
+         <col width="2%"/>
+         <col width="15%"/>
+         <col width="15%"/>
+         <col width="40%"/>
+         <col width="15%"/>
+         <col width="15%"/>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Page Name</th>
+            <th>Page Label</th>
+            <th>Page PageID</th>
+            <th>Is Exist</th>
+            <th>TR Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @pages[:data][:not_expected_results].each.with_index(1) do |page,idx| %>
+            <%= erb :page_row , :locals => {:page => page, :idx => idx} %>
+          <% end %>              
+        </tbody>
+        </table>
+    </div>
+  <% end %>  
+<% end %>

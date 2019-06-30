@@ -1,0 +1,2 @@
+TrunkServer http://servertrunk.mo.bla.corp:8082/metrics
+BranchServer http://serverbranch.mo.bla.corp:8082/metrics

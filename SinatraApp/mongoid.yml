@@ -1,0 +1,27 @@
+trunk:
+  clients:
+    default:
+      database: trunkdb
+      hosts:
+        - autoreports:27017
+  options:
+    raise_not_found_error: false
+
+trunk-dev:
+  clients:
+    default:
+      database: trunk
+      hosts:
+        - autoreports:27017
+  options:
+    raise_not_found_error: false
+
+trunk-archive:
+  clients:
+    default:
+      database: trunk
+      hosts:
+        - mongo:27017
+      use_activesupport_time_zone: true
+  options:
+    raise_not_found_error: false

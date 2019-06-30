@@ -1,0 +1,142 @@
+<html>
+  <body>
+    <div class="col-md-12 col-sm-12 col-xs-12">
+     <div class="x_panel">
+       <div class="x_content">         
+          <h2 class="text-muted font-13 m-b-30">Tests List</h2>                
+
+              <div class="dropdown pull-left">
+                  <button class="btn btn-primary dropdown-toggle btn-xs" type="button" data-toggle="dropdown" id="view">View Json
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" id="env"></ul>                                             
+              </div>
+
+              <div class="dropdown pull-left">
+                  <button class="btn btn-primary dropdown-toggle btn-xs" type="button" data-toggle="dropdown" id="analysis">Trigger Analysis
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" id="exec_envs"></ul>                                             
+              </div> 
+
+              <button type="button" id="test_button" class="btn btn-primary btn-xs">
+                  <i class="fa fa-play-circle"> </i> Trigger Test
+              </button>                                
+                      
+              <span id='trigger_indicator'></span>            
+              <span id='test_link' href=""></span> 
+          
+          <div class="card-box table-responsive">           
+          <table id="datatable-keytable_test" class="table-hover table table-striped table-bordered" role="grid">              
+            <thead>              
+              <tr>                    
+                <th>TestName</th>                      
+                <th>TestType</th>                    
+                <th>last_execution_id</th>
+                <th>last_analysis_id</th>
+              </tr>
+            </thead>      
+            <tbody>
+            <% @tests.each do |test| %>
+              <tr>       
+                <td><%= test[:test_name] %></td>                    
+                <td><%= test[:test_type] %></td>                                                  
+                <td><a href="/list_executions?execution_id=<%= test[:last_execution_id] %>"><%= test[:last_execution_id] %></a></td> 
+                <td><a href="/list_analysis?analysis_id=<%= test[:last_analysis_id] %>"><%= test[:last_analysis_id] %></a></td>    
+              </tr>
+            <% end %>
+            </tbody>                            
+          </table>                    
+        </div>      
+        </div>
+     </div>
+  </div>   
+
+    <script src="./vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Datatables-->
+    <script src="./vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="./vendors/datatables.net/js/dataTables.select.min.js"></script>
+    <script src="./vendors/datatables.net/js/dataTables.buttons.min.js"></script>
+    <script src="./vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="./vendors/Chart.js/dist/Chart.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="./vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="./vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="./vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="./vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="./vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+   <!-- Datatables -->
+
+    <script>    
+     $(document).ready(function() {     
+        var test_name;
+        var environment;
+        var trigger_indicator = document.getElementById('trigger_indicator');   
+        var test_link = document.getElementById('test_link');   
+        
+        var tests_table= $('#datatable-keytable_test').DataTable({
+          keys: true ,
+          select: true
+
+        });
+
+        $('#view').click(function() {             
+          if (test_name == null ) {
+            trigger_indicator.textContent="Please Choose Test from the list"          
+          }
+        });    
+
+        $('#analysis').click(function() {   
+          if (test_name == null ) {
+              trigger_indicator.textContent="Please Choose Test from the list"          
+            }
+         });
+
+        $('#test_button').click(function() {   
+          if (test_name == null ) {
+              trigger_indicator.textContent="Please Choose Test from the list"          
+            }
+         });
+
+       tests_table.on( 'select', function ( e, dt, type, indexes ) {           
+              test_name = tests_table.rows( indexes ).data().toArray()[0][0];
+              console.log("test=" + test_name);
+               
+              $('#env').empty()  
+              $('#exec_envs').empty()  
+             
+             $('#test_button').click(function() {                  
+                window.location.href = "trigger_test_form?test_name=" + test_name;
+              }); 
+
+              $.get("get_test_envs", { test_name: test_name},                
+                function(response) {  
+                  var result=$.parseJSON(response);                        
+                  for(i=0; i<result.length; i++) {                 
+                    href="view_json?test_name=" + test_name + "&environment=" + result[i].environment                
+                    $('#env').append('<li><a href=' + href + ">" + result[i].environment + '</a></li>');
+                  }
+                  for(i=0; i<result.length; i++) {                 
+                    href="last_execution?test_name=" + test_name + "&environment=" + result[i].environment                
+                    $('#exec_envs').append('<li><a href=' + href + ">" + result[i].environment + '</a></li>');
+                  }                                   
+              });  
+
+             $('#analysis').click(function() {   
+              if  ($('#env li').length == 0) {
+                    window.location.href = "view_json?test_name=" + test_name;
+                  }              
+             }); 
+              $('#view').click(function() {   
+              if  ($('#env li').length == 0) {
+                    window.location.href = "view_json?test_name=" + test_name;
+                  }              
+             });             
+         });
+     });
+    </script>
+  </body>
+</html>

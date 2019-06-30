@@ -1,0 +1,40 @@
+<project name="Server-Dev" default="server-dev-assembly" basedir=".">
+<description>
+        Ant Task to Create merged Custom Server Artifact for Developers
+</description>
+
+<!-- build parameters -->
+<property environment="env"/>
+<property name="M2_HOME" value="${env.USERPROFILE}/.m2"/>
+<property name="build" location="C:/dev/trunk/server_ng/output/x86-windows-64/"/>
+<property name="branch" value="trunk"/>
+<property name="version" value="1.0-SNAPSHOT"/>
+
+<echo message="Build properties: "/>
+<echo message="branch=${branch}"/>
+<echo message="version=${version}"/>
+<echo message="build=${build}"/>
+
+<!-- Assemble Server artifact -->
+<target name="server-dev-assembly" depends="compile-CustomerClassifiern" description="overwrite server files with customized data from customwork">
+    <!-- overwrite customization data -->
+    <echo message="Assembling server"/>
+    <copy todir="${build}/data" overwrite="true">
+      <fileset dir="${customization}/staff" excludes="**/config*.conf **/BuildCoreFirstDBA.sql"/>
+    </copy>
+</target>
+
+<target name="compile-Customer" description="compile Customer Data ">
+    <echo message="Compile Customer jar"/>
+    <subant target="jar">
+        <fileset dir="./CustomerSummary" includes="build.xml"/>
+    </subant>
+     <copy todir="${customization}/data/lib">
+      <fileset dir="./CustomerSummary/dist">
+         <include name="*.jar"/>
+      </fileset>
+    </copy>
+   <delete>
+        <fileset dir="./CustomerSummary/dist" includes="*.jar"/>
+   </delete>
+</target>

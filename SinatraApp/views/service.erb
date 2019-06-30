@@ -1,0 +1,61 @@
+<html>
+<style type="text/css">
+	h1, h5, th { text-align: center; }
+table { margin:0px; padding:0px; text-align:left;font-family: Segoe UI; box-shadow: 10px 10px 5px #888; border: thin ridge grey; }
+th { background: #0046c3; color: #fff; max-width: 400px; padding: 5px 10px; }
+td { font-size: 11px; padding: 5px 20px; color: #000; }
+tr { background: #b8d1f3; }
+tr:nth-child(even) { background: #dae5f4; }
+tr:nth-child(odd) { background: #b8d1f3; }
+</style>
+
+<div class="cent">
+<body>
+  <h1>Automation Test Report: <%=@testname%><h1>
+  <h4>application:<%=@application%></h4>
+  <h4>Test Success Rate:<%=@test_rate%>%</h4>
+
+   <table  width="100%">
+   <tr>
+      <td></td>
+      <th>Success Count</th>
+      <th>Failed Count</th>
+      <th>Success Rate</th>
+   </tr>
+   <tr>
+    <% if ! @pages.nil? and ! @pages[:total_count].eql?(0) %>
+      <th scope="row">Page Instances</th>
+      <td><%= @pages[:success_count]%></td>
+      <td><%= @pages[:failed_count]%></td>
+      <td><%= @pages[:success_rate]%>%</td>
+    <% end %>
+    </tr> 
+    <tr>
+    <% if ! @trans.nil? and ! @trans[:total_count].eql?(0)%>
+      <th scope="row">Transaction Instances</th>
+      <td><%= @trans[:success_count]%></td>
+      <td><%= @trans[:failed_count]%></td>
+      <td><%= @trans[:success_rate]%>%</td>
+    <% end %>  
+    </tr>
+    <tr>
+    <% if ! @workunits.nil? and ! @workunits[:total_count].eql?(0)%>
+      <th scope="row">Workunits</th>
+      <td><%= @workunits[:success_count]%></td>
+      <td><%= @workunits[:failed_count]%></td>
+      <td><%= @workunits[:success_rate]%>%</td>
+    <% end %>  
+    </tr>
+    <tr>
+    <% if ! @workunitsattr.nil? and ! @workunitsattr[:total_count].eql?(0)%>
+      <th scope="row">Workunits attributes</th>
+      <td><%= @workunitsattr[:success_count]%></td>
+      <td><%= @workunitsattr[:failed_count]%></td>
+      <td><%= @workunitsattr[:success_rate]%>%</td>
+    <% end %>  
+    </tr>
+  </table>
+
+  </body>
+</html>
+

@@ -1,0 +1,76 @@
+<div class="x_panel">
+  <div class="x_title">
+      <h2><i class="fa fa-bars"></i> Summary Report </h2>      
+      <div class="clearfix"></div>       
+      <% if ! @analysis.nil? %>
+        <p>
+          <a href="/view_json?test_name=<%= @analysis[:test_name] %>&json_id=<%= @analysis[:json_id]%>&environment=<%= @analysis[:environment] %>">          
+              Test Name: <%= @analysis[:test_name] %>[ <%= @analysis[:json_id] %>]                      
+          </a>
+          <% if @curr_id.nil? %>
+            (latest_version)
+          <% else %>
+            <a href="/compare_jsons?test_name=<%= @analysis[:test_name] %>&json_id1=<%= @analysis[:json_id]%>&json_id2=<%= @curr_id %>">     
+                <button>compare_to_latest</button>
+            </a>
+          <% end %>
+        </p>
+        <p>Environment: <%= @analysis[:environment] %></p>
+        <p>Analysis Id: <%= @analysis[:analysis_id] %></p>
+        <p>Success Rate: <%= @analysis[:success_rate] %>%</p>
+        <p>TimeStamp: <%= @analysis[:timestamp] %></p>
+        <p>Server: <%= @analysis[:server] %></p>
+        <p>Time Frame: <%= @analysis[:tf_start] %> - <%= @analysis[:tf_end] %></[td]></p>
+      <% end %>
+  </div>   
+
+  <div class="x_content">
+    <div class="" role="tabpanel" data-example-id="togglable-tabs">
+      <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+        <li role="presentation" class="active">
+         <% if ! @pages.nil? %>
+            <a href="#pages_content" role="tab" id="pages-tab" data-toggle="tab" aria-expanded="false">Pages Instances  [<%=@pages[:success_rate]%>%]</a>
+          <% end %> 
+        </li>
+         <li role="presentation" class="">
+          <% if ! @trans.nil? %>
+            <a href="#transactions_content" role="tab" id="transactions-tab" data-toggle="tab" aria-expanded="false">Transaction Instances  [<%=@trans[:success_rate]%>%]</a>
+          <% end %>  
+        </li>  
+         <li role="presentation" class="">
+          <% if ! @trans.nil? && ( ! @trans[:dimensions].nil? && @trans[:dimensions][:total_count].nonzero?) %>
+            <a href="#transactions_dimension_content" role="tab" id="transactions-dim-tab" data-toggle="tab" aria-expanded="false">Transaction Instances dimensions  [<%=@trans[:dimensions][:success_rate]%>%]</a>
+          <% end %>
+        </li>
+         <li role="presentation" class="">
+          <% if ! @workunits.nil? %>
+            <a href="#workunits_content" role="tab" id="workunits-tab" data-toggle="tab" aria-expanded="false">Workunits  [<%=@workunits[:success_rate]%>%]</a>
+          <% end %>  
+        </li>  
+         <li role="presentation" class="">
+          <% if ! @workunitsattr.nil? && @workunitsattr.total_count.nonzero? %>
+            <a href="#workunitsattr_content" role="tab" id="workunitsattr-tab" data-toggle="tab" aria-expanded="false">WorkunitsAttr  [<%=@workunitsattr[:success_rate]%>%]</a>
+          <% end %>  
+        </li>              
+      </ul>
+    </div>
+    <div id="myTabContent" class="tab-content">
+      <div width="100%" role="tabpanel" class="tab-pane fade in active" id="pages_content" aria-labelledby="pages-tab">
+         <%= erb :pages %>    
+      </div>   
+      <div width="100%" role="tabpanel" class="tab-pane fade" id="transactions_content" aria-labelledby="transactions-tab">
+          <%= erb :transactions %>   
+      </div>
+      <div width="100%" role="tabpanel" class="tab-pane fade" id="transactions_dimension_content" aria-labelledby="transactions-dim-tab">
+          <%= erb :dimensions %>
+      </div>
+
+      <div width="100%" role="tabpanel" class="tab-pane fade" id="workunits_content" aria-labelledby="workunits-tab">
+          <%= erb :workunits %>   
+      </div>
+      <div width="100%" role="tabpanel" class="tab-pane fade" id="workunitsattr_content" aria-labelledby="workunitsattr-tab">
+          <%= erb :workunitsattr %>   
+      </div>
+    </div>
+  </div>
+</div>

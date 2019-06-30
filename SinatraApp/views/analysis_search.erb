@@ -1,0 +1,129 @@
+<html>
+  <body>
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Search Analysis<small>by one or more critetira : test_name, target_server and time_frame</small></h2>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <div class="row">          	
+  			    <form id="search_form" class="form-horizontal">
+  			      <div class="form-group">
+              <label class="control-label col-md-1 col-sm-1 col-xs-1">Test Name</label>			        
+  			        <div class="col-md-4 col-sm-4 col-xs-12">
+  			          <input id="test_text" type="text" class="form-control" placeholder="test name you want to search...">
+  			        </div>
+  			      </div>
+  			      <div class="form-group">
+  			        <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">Server Host </label>
+  			        <div class="col-md-4 col-sm-4 col-xs-12">
+  			          <input id="server_text" type="text" class="form-control"  placeholder="optier server of your searched test... ">
+  			        </div>
+  			      </div>   
+  			      <div class="form-group">         
+  			       <label class="control-label col-md-1 col-sm-1 col-xs-12">Time Frame </label>
+  			        <div class="col-md-4 col-sm-4 col-xs-12">
+  				      <div id="reportrange" class="pull-left" style="background: #fff; cursor: pointer; padding: 7px 10px; border: 1px solid #ccc">
+  				        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+  				        <span>Aug 01, 2016 - Oct 30 , 2016</span> <b class="caret"></b>
+  				      </div>
+  				     </div>
+  				   </div>
+  				   <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+  		          <button type="submit" class="btn btn-success">Submit</button>
+  		       </div>
+  			   	</form>
+          </div>
+  	     </div>	
+	     </div>
+    </div>
+
+    <!-- jquery -->
+    <script src="./vendors/jquery/dist/jquery.min.js"></script>  
+    <!-- bootstrap-daterangepicker -->
+    <script src="./js/moment/moment.min.js"></script>
+    <script src="./js/datepicker/daterangepicker.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="./build/js/custom.min.js"></script>
+    <!-- iCheck -->
+    <script src="./vendors/iCheck/icheck.min.js"></script>
+    
+    <script type="text/javascript">
+      $(document).ready(function() {
+
+        var tf_start;
+        var tf_end;
+        var test_name;
+        var server;
+        var cb = function(start, end, label) {
+          $('#reportrange span').html(start.format('MMMM D, YYYY HH:MM:ss') + ' - ' + end.format('MMMM D, YYYY HH:MM:ss'));
+        };
+
+        var optionSet1 = {
+          startDate: moment().subtract(29, 'days'),
+          endDate: moment(),
+          minDate: '01/08/2016',
+          maxDate: '12/31/2018',
+          dateLimit: {
+            days: 60
+          },
+          showDropdowns: true,
+          showWeekNumbers: true,
+          timePicker: true,
+          timePickerIncrement: 1,
+          timePicker12Hour: true,
+          ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],          
+            'This Month': [moment().subtract(6, 'days').startOf('month'), moment().endOf('month')],         
+          },
+          opens: 'left',
+          buttonClasses: ['btn btn-default'],
+          applyClass: 'btn-small btn-primary',
+          cancelClass: 'btn-small',
+          format: 'MM/DD/YYYY HH:MM:ss',
+          separator: ' to ',
+          locale: {
+            applyLabel: 'Submit',
+            cancelLabel: 'Clear',
+            fromLabel: 'From',
+            toLabel: 'To',
+            customRangeLabel: 'Custom',
+            daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            firstDay: 1
+          }
+        };
+        $('#reportrange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY HH:MM:ss') + ' - ' + moment().format('MMMM D, YYYY HH:MM:ss'));
+        $('#reportrange').daterangepicker(optionSet1, cb);     
+        $('#reportrange').on('apply.daterangepicker', function(ev, picker) {          
+          tf_start =  picker.startDate
+          tf_end = picker.endDate          
+        });   
+
+   		var url="";   
+        $('#search_form').on('submit', function (e) {
+          var test_name= $('#test_text').val()        
+          if(test_name != ''){                
+            url=(url == "") ? "test_name=" + test_name : url + "&test_name" + test_name;                      
+          }  
+          var server= $('#server_text').val()     
+          if(server != ''){            
+            url=(url == "") ? "server=" + server : url + "&server" + server;                        
+          }  
+          if(tf_start != undefined){            
+            url=(url == "") ? "tf_start=" + tf_start : url + "&tf_start" + tf_start;                       
+          }  
+          if(tf_end != undefined){
+            url=(url == "") ? "tf_end=" + tf_end : url + "&tf_end" + tf_end;            
+          }              
+          console.log(url)
+          window.location.href = "list_analysis?" + url;
+          return false;
+        });
+      });     
+    </script>
+  </body>
+</html>

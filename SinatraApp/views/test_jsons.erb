@@ -1,0 +1,77 @@
+<html>
+ <body>
+
+  <div class="col-md-8 col-sm-8 col-xs-12">    
+    <div class="x_panel tile fixed_height_320">
+      <div class="x_title">
+      <h2>Jsons Comparison</h2>      
+      <div class="clearfix"></div>
+    </div>      
+    <div class="x_content">
+      <p><small>Choose testname and 2 versions of jsons to compare</small></p>      
+      <select id="tests_comp_list">
+      <option value="">--</option>
+        <% @tests.each do |test| %>                  
+          <option value=<%= test.json_id %>><%= test.test_name %></option>
+        <% end %>
+      </select>
+
+      <select id="test_jsons_source">
+      </select>
+       <select id="test_jsons_target">
+      </select>
+       <button type="button" id="compare_button" onclick="compare()" class="btn btn-primary btn-xs">
+            <i class="fa fa-play-circle"> </i> Compare
+        </button> 
+      <span id='comparison_indicator'></span>
+    </div>
+  </div>
+  </div>
+
+<script src="./vendors/jquery/dist/jquery.min.js"></script>
+
+<!-- Test Compare view -->
+  <script type="text/javascript">
+  var test_name
+  var source_id
+  var target_id 
+  var cmp_indicator = document.getElementById('comparison_indicator');
+   $('#tests_comp_list').change(function() {
+      $('#test_jsons_source').empty()
+      $('#test_jsons_target').empty()
+       var chosen_test = $('#tests_comp_list').find(":selected");
+       test_name=chosen_test.text()     
+    
+       $.get("get_test_jsons", { test_name: test_name},
+           function(response) {          
+            var result=$.parseJSON(response);                          
+            $('#test_jsons_source').append("<option value=--></option>")
+            for(i=0; i<result.length; i++) {
+              $('#test_jsons_source').append("<option value="+result[i].json_id+">"+result[i].json_id+"</option>");
+            }
+            $('#test_jsons_target').append("<option value=--></option>")
+            for(i=0; i<result.length; i++) {
+              $('#test_jsons_target').append("<option value="+result[i].json_id+">"+result[i].json_id+"</option>");
+            }
+        });        
+   });
+
+   $('#test_jsons_source').change(function() {
+     source_id = $('#test_jsons_source').find(":selected").text();         
+    });
+
+   $('#test_jsons_target').change(function() {
+    target_id = $('#test_jsons_target').find(":selected").text();           
+    });
+
+    function compare() {          
+      if (source_id == target_id) {
+         cmp_indicator.style.color = 'green';
+        cmp_indicator.textContent = "nothing to compare. same json"
+      }else{
+        window.location.href = "compare_jsons?test_name=" + test_name + "&json_id1=" + source_id + "&json_id2=" + target_id;   
+      }
+    }  
+  </script>
+  </body>
+  </html>

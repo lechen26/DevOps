@@ -1,0 +1,47 @@
+<html>
+  <body>
+    <style>
+     .x_title_header {
+      border-bottom: 2px solid #E6E9ED;
+      padding: 1px 5px 6px;}
+    </style>
+
+
+    <% if ! @trans.nil? && @trans[:total_count].nonzero?%>
+      <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+       
+        <!-- Non pages transactions -->
+        <div class="panel">
+          <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#nonepage" aria-expanded="true" aria-controls="None Page">
+            <% if ! @trans.nil? && @trans[:data][:expected_results].select { |t| ! t[:tr_status] && t[:pageId].nil?}.count.nonzero? %>
+                <h4 class="panel-title" style="color:red">None Page</h4>
+            <% else %>
+                <h4 class="panel-title" >None Page</h4>
+            <% end %>
+          </a>    
+        </div> 
+        <div id="nonepage" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">  
+              <%= erb :transactions_per_page  , :locals => {:pageId => nil} %>
+        </div> 
+
+        <!-- transactions per Page -->
+        <% @pages[:data][:expected_results].each.with_index(1) do |page,idx| %>    
+          <% if page[:page_exist]  %>
+            <div class="panel">
+              <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#page<%= idx %>" aria-expanded="true" aria-controls="page<%= idx %>">              
+	      <% if ! @trans.nil? && @trans[:data][:expected_results].select{ |t| t[:pageId].eql?(page[:pageId]) && ( ! t[:tr_status] || ! t[:wu_status] || t[:wu_attr_status] )}.count.nonzero? %>
+		  <h4 class="panel-title"  style="color:red"><%= page[:name]%>     ,pageid: <%=page[:pageId] %></h4>
+              <% else %>
+                <h4 class="panel-title" ><%= page[:name]%>     ,pageid: <%=page[:pageId] %></h4>
+              <% end %>
+              </a>   
+            </div>  
+            <div id="page<%= idx %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">  
+                <%= erb :transactions_per_page  , :locals => {:pageId => page[:pageId]} %>
+            </div>             
+          <% end %>
+        <% end %> 
+      </div>
+    <% end %>
+  </body>
+</html>

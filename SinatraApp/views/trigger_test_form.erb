@@ -1,0 +1,103 @@
+<html>
+	<body>
+		<div class="x_panel">
+  			<div class="x_title">
+				<h2>Trigger Test</h2>
+				<div class="clearfix"></div>
+  			</div>  		
+  			<div class="x_content">
+				<div class="row">
+       				<form id="trigger_form" class="form-horizontal">			
+         				<div class="form-group">
+           					<label class="control-label col-md-1 col-sm-1 col-xs-1">Test Name</label>           				
+           						<div class="col-md-3 col-sm-3 col-xs-12">
+	             					<input id="test_text" type="text" class="form-control" placeholder=<%= @test[:test_name] %>>
+    	       					</div>      	   					       					
+     	   					 <span id='trigger_indicator'></span>            
+             				<span id='test_link' href=""></span>     
+         				</div>
+
+         				  <div class="form-group">
+					           <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">Environment</label>
+					           <div class="col-md-3 col-sm-3 col-xs-12">
+					             <input id="env_text" type="text" class="form-control" value="">
+					           </div>
+					        </div>   
+
+				        <div class="form-group">
+				           <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">Server Name </label>
+				           <div class="col-md-3 col-sm-3 col-xs-12">
+				             <input id="server_text" type="text" class="form-control" placeholder="">
+				           </div>
+				        </div>   
+
+				         <div class="form-group">
+				           <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">Application Name</label>
+				           <div class="col-md-3 col-sm-3 col-xs-12">
+				             <input id="app_text" type="text" class="form-control" placeholder="">
+				           </div>
+				        </div>   					  
+	      				<%if @test[:test_type] == "Selenium" %>
+	      				  <div class="form-group">
+					           <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">Scope</label>
+					           <div class="col-md-3 col-sm-3 col-xs-12">
+					             <input id="scope_text" type="text" class="form-control" value="Trunk">
+					           </div>
+					        </div> 	      				 
+
+							<div class="form-group">
+					           <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">SeleniumEnv</label>
+					           <div class="col-md-3 col-sm-3 col-xs-12">
+					             <input id="selenium_text" type="text" class="form-control" value="centralgrid">
+					           </div>
+					        </div>   
+
+					        
+
+					        <div class="form-group">
+					           <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">BrowserType</label>
+					           <div class="col-md-3 col-sm-3 col-xs-12">
+					             <input id="browser_text" type="text" class="form-control" value="gc">
+					           </div>
+					        </div>   
+					    <% end %>
+	      				<div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-1">
+          					<button id="submit" type="submit" value="Submit" class="btn btn-success">Submit</button>
+        				</div>
+	   				</form>
+    			</div>	
+  			</div>
+		</div>
+
+	<!-- jquery --> 
+	<script src="./vendors/jquery/dist/jquery.min.js"></script>
+	<!-- bootstrap-daterangepicker -->
+
+	<script type="text/javascript">	
+		$(document).ready(function() {			  
+			$('#test_text').val($('#test_text').attr('placeholder'));			      	   		
+	    	$('#trigger_form').on('submit', function (e) {		    
+	    		test_name=$('#test_text').val();
+	  	   		server=$('#server_text').val(); 			  			
+	  	   		application=$('#app_text').val(); 			  					        
+	  	   		env=$('#env_text').val(); 		
+	  	   		scope=$('#scope_text').val(); 			  					        
+	  	   		selenium=$('#selenium_text').val(); 
+	  	   		browser=$('#browser_text').val(); 			  					        
+		        $.get("trigger_test", { test_name: test_name, server: server, application: application, scope:scope, environment: env, selenium: selenium, browser: browser},
+	            	function(response) {             
+		                var result=$.parseJSON(response);                    
+		                if (result["status"] == 200) {
+		                  trigger_indicator.textContent="Jenkins job triggered succesfully!" 
+		                  test_link.textContent=result["url"]
+		                  $("#test_link").attr("href", result["url"]);       
+		                }                        
+	          		}
+          		); 
+          		return false;
+			});
+	    });	   
+  	</script>
+
+  <body>
+</html>  

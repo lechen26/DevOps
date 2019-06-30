@@ -1,0 +1,47 @@
+apply plugin: "org.sonarqube"
+
+dependencies {
+    testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
+    testCompile group: 'commons-io', name: 'commons-io', version: '2.6'
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "ProjectName"
+        property "sonar.projectKey", "KeyName"
+        property "sonar.login", "2de74b4b05102c59637814b88fc3eef2a6ef21a0"
+    }
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
+}
+
+test {
+  useTestNG()
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useTestNG()
+}
+
+task testJar(type: Jar) {
+    classifier 'tests'
+    from sourceSets.integrationTest.output
+    from sourceSets.integrationTest.resources
+    with jar
+}

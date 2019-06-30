@@ -1,0 +1,17 @@
+<% if ! attr.nil?  %>	
+	<tr>
+		<td rowspan="<%= attr[:attrs].length %>"><%= attr[:attrType] %></td>
+		<td><%= attr[:attrs][0][:param] %></td>
+		<td><%= attr[:attrs][0][:expected_value] %></td>
+		<td><%= attr[:attrs][0][:actual_value] %></td>
+		<td rowspan="<%= attr[:attrs].length %>" ><%= attr[:status] %></td>
+	</tr>
+	<% attr[:attrs].drop(1).each do |at| %>					
+			<tr>
+				<td><%= at[:param] %></td>
+				<td><%= at[:expected_value] %></td>
+				<td><%= at[:actual_value] %></td>			
+			</tr>		
+	<% end %>		
+<% end %>
+

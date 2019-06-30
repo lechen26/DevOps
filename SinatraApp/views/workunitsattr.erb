@@ -1,0 +1,47 @@
+<style type="text/css">
+  
+td { overflow: hidden;    }
+</style>
+
+<%if ! @workunitsattr.nil? && @workunitsattr[:total_count].nonzero? %>
+  <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+    <% @workunitsattr[:data][:expected_results].each do |wu| %>   
+      <% if wu[:attrs].any? %>      
+        <div class="panel">
+          <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#<%= wu[:uuid] %>_<%= wu[:wukey] %>" aria-expanded="true" aria-controls="<%= wu[:uuid] %> <%= wu[:wuattr_status] %>">
+	    <% if wu[:status].nil? || wu[:status] %>
+           	 <h4 class="panel-title"> uuid: <%=wu[:uuid]%> ,    asskey: <%= wu[:wukey] %></h4>
+	    <% else %>
+		 <h4 class="panel-title" style="color:red"> uuid: <%=wu[:uuid]%> ,    asskey: <%= wu[:wukey] %></h4>
+           <% end %>
+          </a>   
+        </div>  
+
+        <div id="<%= wu[:uuid] %>_<%= wu[:wukey] %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">                
+            <table class="table  table-striped jambo_table bulk_action" style="table-layout: fixed">
+              <col width="50%"/>
+              <col width="60%"/>
+              <col width="60%"/>
+              <col width="60%"/>            
+              <col width="15%"/>                        
+              <thead>
+                  <tr>                  
+                    <th>Attr Type</th>
+                    <th>Parameter</th>
+                    <th>Expected Value</th>
+                    <th>Actual Value</th>  
+                    <th>Status</th>                  
+                  </tr>
+              </thead>
+              <tbody> 
+                <% wu[:attrs].each do |attr| %>                
+                    <%= erb :workunitsattr_row , :locals => {:attr => attr} %>                  
+                <% end %>                
+              </tbody>
+            </table>     
+        </div> 
+      <% end %>
+    <% end %>  
+    
+  </div>
+<% end %>

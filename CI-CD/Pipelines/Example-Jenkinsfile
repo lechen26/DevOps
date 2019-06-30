@@ -1,0 +1,81 @@
+node("master") {
+
+  // Get Input
+  def env = input(
+    id: 'env', message: 'Please provide env', parameters: [[$class: 'TextParameterDefinition',name: 'env']]
+  )
+
+  // Timeout input
+  timeout(time: 1, unit: 'HOURS') {
+      input 'Please do whatever you need to do. once completed approve.'
+  }
+
+  // Checkout SCM  
+  git branch: "master", credentialsId: 'xxxx', url: 'repo_url'
+  checkout scm: [ $class: "SubversionSCM", locations: [[ remote:"svn_url", local: ".", credentialsId: 'xxxxx']]]
+
+  // Push to Git
+  withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'xxxxx', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
+      sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github_url"
+  }
+
+  // Build With Maven  
+  withMaven(jdk: 'JDK1.8', maven: 'Maven-3', mavenSettingsFilePath: 'settings.xml', mavenOpts: '-Xms1024m -Xmx1024m -Xdebug') {
+          sh 'mvn clean deploy -DuniqueVersion=false'
+  }
+
+  // Trigger remote job with string parameters
+  build job: 'remote-job', parameters: [[$class: 'StringParameterValue', name: 'env', value: "production"],[$class: 'StringParameterValue', name: 'branch', value: "master"]]
+
+  // Run Shell script
+  sh("/init.sh")
+  sh('''
+    cd /home/test
+    mkdir bla
+  ''')
+ 
+
+  // Build Docker image
+  myimg = docker.build("image_name","-f customDockerFile .")
+
+  // Run container from image and check his health with 5 min timeout
+  docker.image('mongo:latest').withRun() { mongo -> 
+    timeout(5) {
+      waitUntil() { 
+        status=sh(script: "docker inspect --format '{{json .State.Health.Status}}' ${mongo.id} | tr -d '\"'",returnStdout: true)        
+        if status == "healthy" {
+          println "Container healthy"
+          return true
+        }
+        return false
+      }
+    }
+  }
+
+  // Push docker Image
+  docker.withRegistry("http://${envs.registry}", "credentialsId") {
+    myimg.push()  or by specific tag myimg.push("myimage.latest")
+  }
+
+
+  // Disable bulk of jobs
+  def jobsToDisable = Jenkins.instance.items.findAll { job -> job.name =~ /${env.JOB_PATTERN}/ }  
+  jobsToDisable.each { job -> job.doDisable() }
+             
+  // Archive Artifacts
+  archiveArtifacts artifacts: "target/my.war"
+
+  // Write File
+  writeFile file: "builderrors.txt", text: errors
+
+  // Notification
+  step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: recipients_list, sendToIndividuals: true])
+
+  emailext attachmentsPattern: 'builderrors.txt', subject: "Errors Found", body: "Hi!\n\n Found errors!"" to: 'email@gmail.com'              
+
+  // Set Build Status
+  currentBuild.result = 'FAILURE' 
+
+  
+~
+~

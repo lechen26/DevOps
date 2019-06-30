@@ -1,0 +1,70 @@
+
+<div class="row">
+        <div class="col-md-6 col-sm-6 col-xs-12">
+        <div class="x_panel fixed_height_500">
+
+          <div class="x_content">
+            <h4>Latest Tests</h4>
+              <% @analysis_latest.each do |env,env_analysis| %>
+
+                <% if ! env.include?("Auto") %>
+	           <h2><%= env %></h2>
+                  <% env_analysis.sort_by { |n| -n[:success_rate] }.each do |analysis| %>
+                    <div class="widget_summary">
+                      <div class="w_left w_55">
+                         <a href="/list_analysis?analysis_id=<%= analysis[:analysis_id] %>"> <%= analysis[:test_name] %> (<%= analysis[:environment]  %>)</a>
+                      </div>
+
+                      <div class="w_center w_55">
+                        <div class="progress">
+                          <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: <%= analysis[:success_rate] %>%;">
+                            <span class="sr-only"><%= analysis[:success_rate] %>% Complete</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="w_right w_20">
+                        <span><%= analysis[:success_rate] %></span>
+                      </div>
+
+                     <div class="w_right w_20">
+                        <span><%= analysis[:execution_status] %></span>
+                      </div>
+                    </div>
+                  <% end %>                
+                <% end %>
+		<% end %>
+
+		<% if @analysis_latest.select{ |k,_| k.include?("Auto") }.any? %>
+		<h2> Platforms </h2>
+		<% end %>
+		<% @analysis_latest.select{ |k,_| k.include?("Auto") }.each do |env,env_analysis| %>
+                    <% env_analysis.sort_by { |n| -n[:success_rate] }.each do |analysis| %>
+                    <div class="widget_summary">
+                      <div class="w_left w_55">
+                         <a href="/list_analysis?analysis_id=<%= analysis[:analysis_id] %>"> <%= analysis[:test_name] %> (<%= analysis[:environment]  %>)</a>
+                      </div>
+
+                      <div class="w_center w_55">
+                        <div class="progress">
+                          <div class="progress-bar bg-green" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: <%= analysis[:success_rate] %>%;">
+                            <span class="sr-only"><%= analysis[:success_rate] %>% Complete</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="w_right w_20">
+                        <span><%= analysis[:success_rate] %></span>
+                      </div>
+
+                     <div class="w_right w_20">
+                        <span><%= analysis[:execution_status] %></span>
+                      </div>
+                    </div>
+                  <% end %>
+                <% end %>
+           </div>
+       </div>
+   </div>
+</div>
+~

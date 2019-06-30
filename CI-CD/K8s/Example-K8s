@@ -1,0 +1,413 @@
+## first need to create ConfigMap using  kubectl create configmap dnajson --from-file=dna-tomcat.json
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: tomcat-stack
+spec:
+  replicas: 1
+  serviceName: zookeeper
+  template:
+    metadata:
+      labels:
+        service: zookeeper
+        env: omcatstack
+    spec:
+      containers:
+      - image: zookeeper:3.4.9   
+        imagePullPolicy: Always
+        name: zookeeper
+        ports:
+        - name: tcp-2181
+          containerPort: 2181
+        - name: tcp-2888
+          containerPort: 2888
+        - name: tcp-3888
+          containerPort: 3888
+        volumeMounts:
+        - mountPath: /var/lib/dna.json
+          subPath: dna-zoo.json
+          name: config
+        env:
+      restartPolicy: Always
+      imagePullSecrets:
+       - name: regsecret
+      volumes:
+      - name: config
+        configMap:
+          name: dnazoojson
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  namespace: tomcat-stack
+  labels:
+    service: zookeeper
+    env: tomcatstack
+spec:
+  ports:
+  - name: tcp-2181
+    port: 2181
+  - name: tcp-2888
+    port: 2888
+  - name: tcp-3888
+    port: 3888
+  clusterIP: None
+  selector:
+    service: zookeeper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-ext
+  namespace: tomcat-stack
+  labels:
+    service: zookeeper
+    env: tomcatstack
+spec:
+  ports:
+  - name: tcp-2181
+    port: 2181  
+    nodePort: 32181
+  selector:
+    service: zookeeper
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tomcat-client
+  namespace: tomcat-stack
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: tomcat-client
+        env: tomcatstack 
+      annotations:
+        pod.beta.kubernetes.io/hostname: tomcat-client
+    spec:
+      containers:
+      - image: tomcat-client:trunk.latest
+        imagePullPolicy: Always
+        name: tomcat-client
+        resources:
+         limits:
+          memory: 10Gi
+         requests:
+          memory: 10Gi
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SERVICE_TYPE
+          value: client
+        - name: KUBE
+          value: "true"         
+        volumeMounts:
+        - mountPath: /var/lib/dna.json
+          subPath: dna-tomcat.json
+          name: config        
+      - image:  ca-bizx:trunk.latest 
+        imagePullPolicy: Always
+        name: ca       
+      restartPolicy: Always    
+      imagePullSecrets:
+       - name: regsecret
+      volumes:
+      - name: config
+        configMap:
+          name: dnatomcatjson
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: tomcat-client
+    env: tomcatstack
+  name: tomcat-client
+  namespace: tomcat-stack
+spec:
+  ports:
+  - name: "8080"
+    port: 8080
+    targetPort: 8080
+    nodePort: 30080
+  selector:
+    service: tomcat-client
+  type: NodePort
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: search
+  namespace: tomcat-stack
+spec:
+  replicas: 1
+  serviceName: search
+  template:
+    metadata:
+      labels:
+        service: search
+        env: tomcatstack  
+    spec:
+      containers:
+      - image: solr:master.latest
+        imagePullPolicy: Always
+        name: search
+        resources:
+          limits:
+            memory: 4Gi     
+        ports:       
+        - name: tcp-8080
+          containerPort: 8080
+        env:
+        - name: SERVICE_TYPE
+          value: search
+        - name: KUBE
+          value: "true"     
+        volumeMounts:
+        - mountPath: /var/lib/dna.json
+          subPath: dna-tomcat.json
+          name: config       
+      restartPolicy: Always      
+      imagePullSecrets:
+       - name: regsecret
+      volumes:
+      - name: config
+        configMap:
+          name: dnatomcatjson    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search
+  namespace: tomcat-stack
+  labels:
+    service: search
+    env: tomcatstack
+spec:
+  ports:
+  - name: tcp-8080
+    port: 8080
+  clusterIP: None
+  selector:
+    service: search
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-ext
+  namespace: tomcat-stack
+  labels:
+    service: search
+    env: tomcatstack
+spec:
+  type: NodePort
+  ports:
+  - name: tcp-8080
+    port: 8080
+    nodePort: 30082
+  selector:
+    service: search
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: tomcat-stack
+spec:
+  replicas: 2
+  serviceName: kafka
+  template:
+    metadata:
+      labels:
+        service: kafka
+        env: tomcatstack  
+    spec:
+      containers:
+      - image: kafka:2.11-0.10.1.0  
+        imagePullPolicy: Always
+        name: kafka
+        resources:
+          limits:
+            memory: 3Gi      
+        ports:       
+        - name: tcp-9092
+          containerPort: 9092
+        volumeMounts:
+        - mountPath: /var/lib/runtime/dna.json
+          subPath: dna-tomcat.json
+          name: config
+      restartPolicy: Always      
+      imagePullSecrets:
+       - name: regsecret
+      volumes:
+      - name: config
+        configMap:
+          name: dnatomcatjson    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: tomcat-stack
+  labels:
+    service: kafka
+    env: tomcatstack
+spec:
+  ports:
+  - name: tcp-9092
+    port: 9092
+  clusterIP: None
+  selector:
+    service: kafka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ext
+  namespace: tomcat-stack
+  labels:
+    service: kafka
+    env: tomcatstack
+spec:
+  type: NodePort
+  ports:
+  - name: tcp-9092
+    port: 9092
+    nodePort: 30085
+  selector:
+    service: kafka
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: ebs
+  namespace: tomcat-stack
+spec:
+  replicas: 1
+  serviceName: ebs
+  template:
+    metadata:
+      labels:
+        service: ebs
+        env: tomcatstack
+    spec:
+      containers:
+      - image: Ncat_ebs:trunk.latest
+        imagePullPolicy: Always
+        name: ebs
+        resources:
+          limits:
+            memory: 3Gi
+        ports:
+        - name: tcp-8080
+          containerPort: 8080
+        volumeMounts:
+        - mountPath: /var/lib//dna.json
+          subPath: dna-tomcat.json
+          name: config
+      restartPolicy: Always
+      imagePullSecrets:
+       - name: regsecret
+      volumes:
+      - name: config
+        configMap:
+          name: dnatomcatjson
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ebs
+  namespace: tomcat-stack
+  labels:
+    service: ebs
+    env: tomcatstack
+spec:
+  ports:
+  - name: tcp-8080
+    port: 8080
+  clusterIP: None
+  selector:
+    service: ebs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ebs-ext
+  namespace: tomcat-stack
+  labels:
+    service: ebs
+    env: tomcatstack
+spec:
+  type: NodePort
+  ports:
+  - name: tcp-8080
+    port: 8080
+    nodePort: 30086
+  selector:
+    service: ebs
+---    
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: tomcat-stack
+spec:
+  replicas: 1
+  serviceName: redis
+  template:
+    metadata:
+      labels:
+        service: redis
+        env: tomcatstack  
+    spec:
+      containers:
+      - image: cache-redis:2.6.14
+        imagePullPolicy: Always
+        imagePullPolicy: Always
+        name: redis        
+        ports:       
+        - name: tcp-6379
+          containerPort: 6379
+        env:
+        - name: REDIS_PORT
+          value: "6379"       
+      restartPolicy: Always      
+      imagePullSecrets:
+       - name: regsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: tomcat-stack
+  labels:
+    service: redis
+    env: tomcatstack
+spec:
+  ports:
+  - name: tcp-6379
+    port: 6379
+  clusterIP: None
+  selector:
+    service: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-ext
+  namespace: tomcat-stack
+  labels:
+    service: redis
+    env: tomcatstack
+spec:
+  type: NodePort
+  ports:
+  - name: tcp-6379
+    port: 6379
+    nodePort: 32700
+  selector:
+    service: redis

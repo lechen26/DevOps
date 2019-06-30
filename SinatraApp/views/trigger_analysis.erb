@@ -1,0 +1,46 @@
+<html>
+  <body>
+
+  <div class="col-md-8 col-sm-8 col-xs-12">  	
+    <div class="x_panel tile fixed_height_320">
+      <div class="x_title">
+          <h2>Tests List</h2>         
+          <div class="clearfix"></div>
+      </div>
+      
+      <div class="x_content">      
+        <h2 class="title"><small>chose a test from the list and click on trigger analysis</small></h2>                    
+        <select id="tests_list">
+          <option value="">--</option>
+          <% @tests.each do |test| %>                  
+            <option value=<%= test.json_id %>><%= test.test_name %></option>
+          <% end %>
+        </select>      
+          <button type="button" id="analysis_button" class="btn btn-primary btn-xs">
+            <i class="fa fa-play-circle"> </i> Trigger Analysis
+        </button>                      
+        <p id='trigger_indicator'></p>
+        <p>
+          <a id='saf_link' href=""></a>                          
+        </p>
+	    </div>      
+    </div>
+  </div>
+
+
+
+  <script src="./vendors/jquery/dist/jquery.min.js"></script>
+  
+  <!-- Test list view -->
+  <script type="text/javascript">
+   $('#tests_list').change(function() {
+       var chosen_test = $('#tests_list').find(":selected");
+       test_name=chosen_test.text()
+        $('#analysis_button').click(function() {   
+            window.location.href = "trigger_analysis?test_name=" + test_name;             
+        });       
+   });  
+  </script>
+
+  <body>
+</html>

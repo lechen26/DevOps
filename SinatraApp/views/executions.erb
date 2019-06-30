@@ -1,0 +1,79 @@
+<html>
+  <body>
+    <div class="col-md-12 col-sm-12 col-xs-12">
+  	 <div class="x_panel">
+	     <div class="x_content">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card-box table-responsive">           
+              <h2 class="text-muted font-13 m-b-30">              
+             	  Executions List 
+                <small></small>            	
+              </h2>
+         
+              <table id="datatable-keytable-executions" class="table-hover table table-striped table-bordered" role="grid">
+                <thead>
+                  <tr>                  	                  
+                    <th>TestName</th>
+                    <th>Environment</th>
+                    <th>StartTime</th>
+                    <th>EndTime</th>                  
+                    <th>Status</th>
+                    <th>ConsoleURL</th>
+                  </tr>
+                </thead>			
+                <tbody>
+                <% @executions.each do |exec| %>
+		              <tr>                        
+                    <td><%= exec[:test_name] %></td>                                                   
+                    <td><%= exec[:environment] %></td>    
+                    <td><%= exec[:tf_start] %></td>                              
+                    <td><%= exec[:tf_end] %></td>                                      
+	          		    <td><%= exec[:status] %></td>
+                    <td><%= exec[:console_url] %></td>
+	          		  </tr>
+          	    <% end %>
+	           		</tbody>           			           	
+              </table>                
+              </div>
+           </div>
+	        </div>
+  	    </div>
+	   </div>
+    </div> 
+
+     <!-- jQuery -->
+    <script src="./vendors/jquery/dist/jquery.min.js"></script>
+        <!-- Datatables -->
+    <script src="./vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="./vendors/datatables.net/js/dataTables.select.min.js"></script>
+    <script src="./vendors/datatables.net/js/dataTables.buttons.min.js"></script>
+    <script src="./vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="./vendors/Chart.js/dist/Chart.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="./vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="./vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="./vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="./vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+    <script src="./vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="./vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  
+      <script>    
+     $(document).ready(function() {     
+
+         var table= $('#datatable-keytable-executions').DataTable({
+          keys: true ,
+          "order": [[ 2, "desc" ]]
+        });
+    
+       tests_table
+          .on( 'select', function ( e, dt, type, indexes ) {
+              testid = tests_table.rows( indexes ).data().toArray()[0][0];
+              console.log(testid);
+         } )
+     } );
+    </script>  
+  </body>
+</html>

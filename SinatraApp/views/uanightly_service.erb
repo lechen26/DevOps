@@ -1,0 +1,39 @@
+<html>
+<style type="text/css">
+	h5, th { text-align: center; }
+table { margin:0px; padding:0px; text-align:left;font-family: Segoe UI; box-shadow: 10px 10px 5px #888; border: thin ridge grey; }
+th { background: #2A3F54; color: #fff; max-width: 400px; padding: 5px 10px; }
+td { font-size: 11px; padding: 5px 20px; color: #000; }
+tr { background: #b8d1f3; }
+tr:nth-child(even) { background: #dae5f4; }
+tr:nth-child(odd) { background: #b8d1f3; }
+</style>
+
+<div class="cent">
+<% if ! @ua_nightly.nil? && ! @ua_nightly_total.nil? %>
+	<body>
+          <% @ua_nightly.each do |env, env_run| %>
+           <h2><%= env %>
+	   <table  width="70%">
+	   <tr>
+	      <th>Test Name</th>
+	      <th>Environment</th>
+	      <th>TimeStamp</th>
+	      <th>Execution Status</th>
+	   </tr>
+	   <% env_run.each do |run| %>
+	   <tr>
+
+	      <td><%= run[:test_name]%></td>
+	      <td><%= run[:environment]%></td>
+	      <td><%= run[:timestamp]%></td>
+	      <td><%= run[:execution_status]%></td>
+	    </tr>
+	    <% end %>
+	  </table>
+         <% end %>
+
+	</body>
+<% end %>
+</html>
+

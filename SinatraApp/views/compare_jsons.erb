@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <meta charset="utf-8">    
+    <link rel="stylesheet" href="./vendors//codemirror/lib/codemirror.css" charset="utf-8">
+    <link rel="stylesheet" href="./build/css/main.css" charset="utf-8">
+  </head>
+
+  <body>
+    <header id="header">
+      <div class="left">
+        <h1>Json Comparison</h1>        
+      </div>
+      <div class="right">
+        <span id="error-message" style="display:none;"/>    
+      </div>
+    </header>
+
+    <div class="json-diff-input">
+      <h5> Json [<%= @json_id1 %>]</h5>
+      <textarea id="json-diff-left"><%= JSON.pretty_generate(JSON.parse(@testobj1)) %></textarea>      
+    </div>
+    <div class="json-diff-input">
+      <h5> Json [<%= @json_id2 %>]</h5>
+      <textarea id="json-diff-right"><%= JSON.pretty_generate(JSON.parse(@testobj2)) %></textarea>               
+      <textarea id="json-diff-right"></textarea>
+    </div>
+
+    <script src="./vendors/jquery/dist/jquery.min.js"></script>
+    <script src="./vendors/fast-json-patch/dist/json-patch-duplex.min.js" charset="utf-8"></script>
+    <script src="./vendors/backbone-events-standalone/backbone-events-standalone.min.js" charset="utf-8"></script>
+    <script src="./vendors/codemirror/lib/codemirror.js" charset="utf-8"></script>
+    <script src="./vendors/codemirror/lib/util/formatting.js" charset="utf-8"></script>
+    <script src="./vendors/codemirror/mode/javascript/javascript.js" charset="utf-8"></script>
+    <script src="./vendors/codemirror/addon/edit/matchbrackets.js" charset="utf-8"></script>
+    <script src="js/main.js" charset="utf-8"></script>  
+  </body>
+</html>

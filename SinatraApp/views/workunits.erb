@@ -1,0 +1,81 @@
+<style type="text/css">
+  
+td { overflow: hidden;    }
+</style>
+
+<%if ! @workunits.nil? && @workunits[:total_count].nonzero? %>
+  <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+    <% @trans[:data][:expected_results].select{|t| t[:tr_exist] == true }.each do |tran| %>         
+      <div class="panel">
+        <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#<%= tran[:uuid] %>" aria-expanded="true" aria-controls="<%= tran[:uuid] %>">
+          <% if tran[:wu_status] && ( tran[:wu_attr_status].nil? || tran[:wu_attr_status] )%>
+            <h4 class="panel-title" ><%= tran[:name]%>     ,uuid: <%=tran[:uuid] %></h4>
+          <% else %>
+            <h4 class="panel-title" style="color:red"><%= tran[:name]%>     ,uuid: <%=tran[:uuid] %></h4>
+          <% end %>
+        </a>   
+      </div>  
+
+      <div id="<%= tran[:uuid] %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">      
+        <% if @workunits[:data][:expected_results].any? %>
+          <h4>Expected workunits </h4>
+          <table class="table  table-striped jambo_table bulk_action" style="table-layout: fixed">
+            <col width="70%"/>
+            <col width="50%"/>
+            <col width="50%"/>
+            <col width="20%"/>            
+            <col width="15%"/>            
+            <col width="15%"/>            
+            <thead>
+                <tr>                  
+                  <th>AssociationKey</th>
+                  <th>InvokingTier</th>
+                  <th>ExecutingTier</th>
+                  <th>Protocol</th>
+                  <th>WU Status</th>
+                  <th>WU Attr Status</th>
+                </tr>
+            </thead>
+            <tbody> 
+              <% @workunits[:data][:expected_results].each do |wuquery| %>
+                <% if wuquery[:uuid].eql?(tran[:uuid]) %>
+                  <%= erb :workunit_row , :locals => {:workunit => wuquery} %>
+                <% end %>
+              <% end %>                
+            </tbody>
+          </table>      
+        <% end %>
+        
+        <% if @workunits[:data][:not_expected_results].any?{ |w| w[:uuid] == tran[:uuid]} %>  
+          <h4>Un-Expected workunits </h4>
+          <table class="table  table-striped jambo_table bulk_action" style="table-layout: fixed">
+            <col width="70%"/>
+            <col width="50%"/>
+            <col width="50%"/>
+            <col width="15%"/> 
+            <col width="15%"/>                       
+            <thead>
+                <tr>
+                  <th>AssociationKey</th>
+                  <th>InvokingTier</th>
+                  <th>ExecutingTier</th>
+                  <th>Protocol</th>
+                  <th>Status</th>
+                  <th>WU Status</th>
+                  <th>WU Attr Status</th>
+                </tr>
+            </thead>
+            <tbody> 
+              <% @workunits[:data][:not_expected_results].each do |wuquery| %>
+                <% if wuquery[:uuid].eql?(tran[:uuid]) %>
+                  <%= erb :workunit_row , :locals => {:workunit => wuquery} %>
+                <% end %>
+              <% end %>                
+            </tbody>
+          </table>      
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+       

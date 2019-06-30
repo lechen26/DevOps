@@ -1,0 +1,39 @@
+<style type="text/css">
+
+td { overflow: hidden;    }
+</style>
+
+<% @trans[:data][:expected_results].select{|t| ! t[:tr_dims_status].nil? }.each do |tran| %>
+  <div class="panel">
+        <a class="panel-heading" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#<%= tran[:uuid] %>" aria-expanded="true" aria-controls="<%= tran[:uuid] %>">
+          <% if tran[:tr_dims_status] %>
+            <h4 class="panel-title" ><%= tran[:name]%>     ,uuid: <%=tran[:uuid] %></h4>
+          <% else %>
+            <h4 class="panel-title" style="color:red"><%= tran[:name]%>     ,uuid: <%=tran[:uuid] %></h4>
+          <% end %>
+        </a>
+      </div>
+
+ 	<div id="<%= tran[:uuid] %>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+
+	<table class="table  table-striped jambo_table bulk_action" style="table-layout: fixed">
+              <col width="50%"/>
+              <col width="60%"/>
+              <col width="60%"/>
+              <col width="15%"/>
+              <thead>
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Expected Value</th>
+                    <th>Actual Value</th>
+                    <th>Status</th>
+                  </tr>
+              </thead>
+              <tbody>
+		 <% tran[:tr_dims].each do |dim| %>
+                    <%= erb :dimension_row , :locals => {:dim => dim} %>
+                <% end %>
+              </tbody>
+            </table>
+      </div>
+<% end %>

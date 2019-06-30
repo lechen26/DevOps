@@ -1,0 +1,132 @@
+<html>
+	<body>
+		<div class="x_panel">
+
+  			<div class="x_title">
+				<h2>Trigger Analysis<small>information based on last analysis by default</small></h2>
+				<div class="clearfix"></div>
+  			</div>
+
+  			<div class="x_content">
+				<div class="row">
+       				<form id="analysis_form" class="form-horizontal">			
+         				<div class="form-group">
+           					<label class="control-label col-md-1 col-sm-1 col-xs-1">Test Name</label>
+           					<div class="col-md-3 col-sm-3 col-xs-12">
+             					<input id="test_text" type="text" class="form-control" placeholder=<%= @execution[:test_name] %>>
+           					</div> 
+     	   					<span id='analysis'></span>                 
+     	   					<span><a id='analysis_link' href=""></a></span>                                                        
+         				</div>
+
+ 						<div class="form-group">
+				           <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">Environment </label>
+				           <div class="col-md-3 col-sm-3 col-xs-12">
+				             <input id="env_text" type="text" class="form-control"  placeholder=<%= @execution[:environment] %>>
+				           </div>
+				        </div> 
+
+				        <div class="form-group">
+				           <label class="control-label text-left col-md-1 col-sm-1 col-xs-12">Server Name </label>
+				           <div class="col-md-3 col-sm-3 col-xs-12">
+				             <input id="server_text" type="text" class="form-control"  placeholder=<%= @execution[:apm_server] %>>
+				           </div>
+				        </div>   
+					    <div class="form-group">         
+           					<label class="control-label col-md-1 col-sm-1 col-xs-12">Server Time Frame </label>
+           					<div class="col-md-6 col-sm-6 col-xs-12">
+	            				<div id="reportrange" class="pull-left" style="background: #fff; cursor: pointer; padding: 7px 21px; border: 1px solid #ccc">
+	             				<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>				       			   
+		           				<span><%= @execution[:tf_start] %> --- <%= @execution[:tf_end] %></span>
+		        				</div>
+	       					</div>
+	     				</div>    
+	      				<div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-1">
+          					<button id="submit" type="submit" class="btn btn-success">Submit</button>          				
+        				</div>
+	   				</form>
+    			</div>	
+  			</div>
+		</div>
+
+		<script src="./vendors/jquery/dist/jquery.min.js"></script>
+		<!-- bootstrap-daterangepicker -->
+		<script src="./js/moment/moment.min.js"></script>
+		<script src="./js/moment/moment-timezone.min.js"></script>
+		<script src="./js/datepicker/daterangepicker.js"></script>
+
+		<script type="text/javascript"> 
+			$(document).ready(function() {
+				var tf_start;
+			    var tf_end;
+					
+				$('#test_text').val($('#test_text').attr('placeholder'));
+			    $('#server_text').val($('#server_text').attr('placeholder'));
+			    $('#env_text').val($('#env_text').attr('placeholder'));
+
+			   	// Handle TimeRange
+			    function cb(start, end) {
+			    	console.log(start)
+			        $('#reportrange span').html(start.format('MMMM D, YYYY HH:MM:ss') + ' - ' + end.format('MMMM D, YYYY HH:MM:ss'));
+			    }
+			   
+			    optionSet1 = {
+			        startDate: tf_start,
+			        endDate: tf_end,
+			        timePicker: true,
+			        format: 'MM/DD/YYYY HH:MM:ss',
+			        ranges: {
+			           'Today': [moment(), moment()],
+			           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+			           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+			           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+			           'This Month': [moment().startOf('month'), moment().endOf('month')],
+			           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+			        },
+			    };  
+
+			    $('#reportrange').daterangepicker(optionSet1, cb); 	    
+				$('#reportrange').on('apply.daterangepicker', function(ev, picker) {           
+			  	  tf_start =  picker.startDate        
+			  	  tf_end = picker.endDate                 
+			  	});
+
+				// Handle Form
+			   $('#analysis_form').on('submit', function (e) {			  
+			       var analysis_indicator = document.getElementById('analysis');         
+			   	   var analysis_link = document.getElementById('analysis_link');	   
+			   	   test_name=$('#test_text').val();
+			  	   server=$('#server_text').val();      
+			  	   env=$('#env_text').val();    
+			  	   console.log($('#reportrange span').text());
+			  	   tf_start=moment($('#reportrange span').text().split("---")[0], "YYYY-MM-DD hh:mm:ss.SSSZ").unix()*1000
+			  	   tf_end=moment($('#reportrange span').text().split("---")[1],"YYYY-MM-DD hh:mm:ss.SSSZ").unix()*1000
+			  	   console.log("start=" + tf_start);
+			  	   console.log("end=" + tf_end);
+			  	   console.log("test_name=" + test_name);
+			  	   console.log("server=" + server);
+			  	   $.ajax({
+					    url: 'service',
+					    type: 'GET',
+					   	data: { test_name: test_name, environment: env, server: server, tf_start: tf_start, tf_end: tf_end},
+					    success: function(data){ 					    						   
+					        var result=$.parseJSON(data);  			
+					        console.log(result);
+					        if (result.status == 200) {
+					        	analysis_indicator.textContent="Analysis executed successfully."
+					        	analysis_indicator.style.color='green';
+			    	    		url="generate_report?analysis_id=" + result["id"]
+			        			analysis_link.textContent="ID=" + result["id"]
+			        			$("#analysis_link").attr("href", url);                          		
+					        }else {
+					        	analysis_indicator.textContent="Cannot trigger Analysis for test with no JSON"
+					        	analysis_indicator.style.color='red';
+					        }					       
+					    }
+					}); 
+			  	   return false;
+			   	});
+			});  
+		</script>
+	</body>	
+</html>

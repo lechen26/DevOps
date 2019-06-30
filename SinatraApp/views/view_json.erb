@@ -1,0 +1,129 @@
+<html>
+    
+    <% if ! @testobj.nil? %>
+      <h2>TestName:  <span id="test_name"><%= @test_name %></span><span id=json_id>[id=<%= @json_id %>]</span>       
+      <% if @new_json %>
+        <small>(this test has no current jsons. lets create the first one)</small>
+      <% elsif @curr_id.nil? %>      
+        (latest_version)
+      <% else %>
+        <a href="/compare_jsons?test_name=<%=  @test_name  %>&json_id1=<%= @json_id%>&json_id2=<%= @curr_id %>">     
+            <button>compare_to_latest</button>
+        </a>
+      <% end %>
+    </h2>
+    
+    <div id='editor_holder'></div>	
+
+    <textarea id='output' style='width: 100%; height: 80%; font-family: monospace;' class="form-control"><%= JSON.pretty_generate(JSON.parse(@testobj))  %></textarea>
+
+   <!--  <button class='btn btn-primary' id='setvalue'>Save</button> -->
+  <button type="button" id="setvalue" class="btn btn-primary btn-xs">
+          <i class="fa fa-save"> </i> Save
+    </button> 
+   <!--  <button class='btn btn-primary' id='setvalue'>Trigger Execution</button>
+     </button>  -->
+    <button type="button" id="trigger" class="btn btn-primary btn-xs">
+        <i class="fa fa-play-circle"> </i> Trigger Analysis
+    </button> 
+     <button type="button" id="generate_json" class="btn btn-primary btn-xs">
+        <i class="fa fa-play-circle"> </i>Generate Json data from test
+    </button>
+    <span id='valid_indicator'></span>
+    <% end %>
+
+    <script src="./vendors/jsonlint/jsonlint.js"></script>
+    <script src="./vendors/jquery/dist/jquery.min.js"></script>
+
+   <script type="text/javascript">
+        var indicator = document.getElementById('valid_indicator');
+
+      function isValidJson(str) {             
+          try {
+              JSON.parse(str);
+              return true;
+          } catch (e) {              
+              try {
+                jsonlint.parse(str)
+              }catch(e) { 
+                return e;
+              }
+          }        
+      }
+
+      function update_json() {
+        $.ajax({
+            url: 'update_json',
+            type: 'post',
+            contentType: 'application/json; charset=UTF-8',
+            accept: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({ "test_name" : test_name, "test_json" : current_data, "env": env_name })  ,  
+            success: function(json) {
+              if (json['new'] == true) {            
+               indicator.textContent = "new version saved. id=" + json['json_id']
+              }            
+              else {                
+               indicator.textContent = "version exist. id=" + json['json_id']
+              }
+             }       
+        })};
+
+      var test_name;
+      var current_data;
+      document.getElementById('setvalue').addEventListener('click',function() { 
+        console.log("click on save");
+        current_data=document.getElementById('output').value;
+        var result = isValidJson(current_data);
+        console.log(result);
+        if (result == true)
+        {   
+          console.log("VALID JSON");
+          json_data=JSON.parse(current_data)
+          if (( json_data.environment == null ) || (json_data.environment == ""))
+          {                  
+            indicator.style.color = 'red';  
+            indicator.textContent = "please provide environment";     
+          }else{
+            env_name=json_data.environment
+            indicator.style.color = 'green';
+            indicator.textContent = "valid json";     
+            test_name=$('#test_name').text() 
+            console.log("test_name=" + test_name)
+            console.log("env=" + env_name);
+            update_json()          
+          }                    
+        }else {
+          indicator.style.color = 'red';
+          indicator.textContent = "not a valid json.  " + result;                  
+      }});
+
+       
+        $('#trigger').click(function() {   
+            current_data=document.getElementById('output').value;
+            test_name=JSON.parse(current_data)["testName"]    
+            environment=JSON.parse(current_data)["environment"]    
+            window.location.href = "last_execution?test_name=" + test_name + "&environment=" + environment;             
+        });  
+
+         $('#generate_json').click(function() { 
+            var indicator = document.getElementById('valid_indicator');
+            test_name=$('#test_name').text();
+            current_data=document.getElementById('output').value;
+            environment=JSON.parse(current_data)["environment"]    
+            $.get("generate_json", { test_name: test_name, environment: environment},
+              function(response) {                   
+                var result=$.parseJSON(response);                
+                if (result["status"] == "200") {
+                  indicator.textContent=result["comment"]                                    
+                  document.getElementById('output').value=result["data"]                  
+                  indicator.style.color='green'
+                }else {
+                  indicator.textContent=result["comment"] 
+                  indicator.style.color='red'
+                }
+            })                  
+          });
+    </script>
+
+ </html>
